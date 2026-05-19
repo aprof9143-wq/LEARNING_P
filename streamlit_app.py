@@ -33,22 +33,43 @@ from typing import Optional
 # --------------------------------------------------------------------------- #
 _HERE = Path(__file__).resolve().parent
 _PARENT = _HERE.parent
-if str(_PARENT) not in sys.path:
-    sys.path.insert(0, str(_PARENT))
+
+# Put both the script's directory AND its parent on sys.path so the imports
+# below work regardless of whether this file lives inside an ``enhanced/``
+# package or at the repo root with its sibling source files.
+for _p in (_HERE, _PARENT):
+    if str(_p) not in sys.path:
+        sys.path.insert(0, str(_p))
 
 import streamlit as st  # noqa: E402  (path setup must run first)
 
-from enhanced.batch import (  # noqa: E402
-    BatchSummary,
-    RowResult,
-    group_rows,
-    run_batch,
-)
-from enhanced.enhanced_ocr import (  # noqa: E402
-    StructuredOcrClient,
-    StructuredOcrError,
-)
-from enhanced.schemas import ExamQuestion  # noqa: E402
+try:
+    # Layout A: ``enhanced/`` is a subfolder of the dir containing this file
+    # (e.g. repo-root/streamlit_app.py + repo-root/enhanced/*.py).
+    from enhanced.batch import (  # noqa: E402
+        BatchSummary,
+        RowResult,
+        group_rows,
+        run_batch,
+    )
+    from enhanced.enhanced_ocr import (  # noqa: E402
+        StructuredOcrClient,
+        StructuredOcrError,
+    )
+    from enhanced.schemas import ExamQuestion  # noqa: E402
+except ModuleNotFoundError:
+    # Layout B: every source file is a flat sibling of this script.
+    from batch import (  # noqa: E402, F401  # type: ignore[no-redef]
+        BatchSummary,
+        RowResult,
+        group_rows,
+        run_batch,
+    )
+    from enhanced_ocr import (  # noqa: E402, F401  # type: ignore[no-redef]
+        StructuredOcrClient,
+        StructuredOcrError,
+    )
+    from schemas import ExamQuestion  # noqa: E402, F401  # type: ignore[no-redef]
 
 
 def _load_env() -> None:

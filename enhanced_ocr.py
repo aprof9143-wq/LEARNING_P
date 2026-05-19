@@ -31,11 +31,18 @@ import anthropic
 import httpx
 from pydantic import ValidationError
 
-from .schemas import (
-    EXAM_QUESTION_TOOL_NAME,
-    EXAM_QUESTION_TOOL_SCHEMA,
-    ExamQuestion,
-)
+try:
+    from .schemas import (
+        EXAM_QUESTION_TOOL_NAME,
+        EXAM_QUESTION_TOOL_SCHEMA,
+        ExamQuestion,
+    )
+except ImportError:  # flat layout: files are siblings, not in a package
+    from schemas import (  # type: ignore[no-redef]
+        EXAM_QUESTION_TOOL_NAME,
+        EXAM_QUESTION_TOOL_SCHEMA,
+        ExamQuestion,
+    )
 
 logger = logging.getLogger(__name__)
 

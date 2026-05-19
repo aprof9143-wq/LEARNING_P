@@ -26,13 +26,22 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Callable, Iterator, Optional
 
-from .enhanced_ocr import (
-    SchemaValidationError,
-    StructuredOcrClient,
-    StructuredOcrError,
-    StructuredOcrResult,
-)
-from .schemas import ExamQuestion, Source
+try:
+    from .enhanced_ocr import (
+        SchemaValidationError,
+        StructuredOcrClient,
+        StructuredOcrError,
+        StructuredOcrResult,
+    )
+    from .schemas import ExamQuestion, Source
+except ImportError:  # flat layout: files are siblings, not in a package
+    from enhanced_ocr import (  # type: ignore[no-redef]
+        SchemaValidationError,
+        StructuredOcrClient,
+        StructuredOcrError,
+        StructuredOcrResult,
+    )
+    from schemas import ExamQuestion, Source  # type: ignore[no-redef]
 
 logger = logging.getLogger(__name__)
 

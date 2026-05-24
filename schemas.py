@@ -51,7 +51,9 @@ class Diagram(BaseModel):
     """Non-textual content (graph, geometric figure, force diagram, etc.)."""
 
     location: str       # which part it belongs to, e.g. "(b)" or "stem"
-    description: str    # factual description only — never invented detail
+    kind: Optional[str] = None  # geometric_figure, graph, force_diagram, table, ...
+    description: str    # detailed factual description — never invented detail
+    labels: list[str] = Field(default_factory=list)  # vertex names, axis labels, side lengths, angles printed in the figure
 
 
 class SolutionByPart(BaseModel):
@@ -191,8 +193,9 @@ EXAM_QUESTION_TOOL_SCHEMA: dict = {
             "type": "array",
             "description": (
                 "Every non-textual figure on the page (graphs, geometric drawings, "
-                "force diagrams, tree diagrams). Describe what is shown — do not "
-                "invent detail."
+                "force diagrams, tree diagrams, tables, circuits, charts). For each "
+                "one, capture EVERY visible element — see the 'Describing diagrams' "
+                "section of the system prompt for what counts. Do not invent detail."
             ),
             "items": {
                 "type": "object",
@@ -200,11 +203,41 @@ EXAM_QUESTION_TOOL_SCHEMA: dict = {
                     "location": {
                         "type": "string",
                         "description": (
-                            "Which part the diagram belongs to, e.g. '(b)', 'stem', "
-                            "or 'solution(a)'."
+                            "Which question element the diagram is anchored to in "
+                            "reading order. Use the part label that immediately "
+                            "precedes the diagram on the page: '(a)', '(b)', '(b)(i)', "
+                            "'stem' (if it sits before part (a)), or 'solution(a)' for "
+                            "a diagram drawn inside the worked solution."
                         ),
                     },
-                    "description": {"type": "string"},
+                    "kind": {
+                        "type": "string",
+                        "description": (
+                            "Best-fit category. Pick from: geometric_figure, "
+                            "function_plot, graph, force_diagram, free_body, "
+                            "tree_diagram, venn, table, circuit, scatter, histogram, "
+                            "bar_chart, number_line, sample_space, other."
+                        ),
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": (
+                            "Exhaustive factual description. Name every shape, "
+                            "labelled point, side length, marked angle, axis label, "
+                            "intercept, asymptote, arrow, shaded region, dashed vs "
+                            "solid line, and qualitative behaviour. Use 'appears to "
+                            "be' when uncertain; never invent specific values."
+                        ),
+                    },
+                    "labels": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": (
+                            "Every text label printed INSIDE or directly next to the "
+                            "figure, as separate strings. E.g. ['A','B','C','60°', "
+                            "'5 cm','x','y','Fig. 2']."
+                        ),
+                    },
                 },
                 "required": ["location", "description"],
             },

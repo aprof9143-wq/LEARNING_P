@@ -97,11 +97,49 @@ LaTeX & formatting rules (apply to every text field you populate):
 - Preserve every step of working on its own line. If a multi-line derivation has been
   flattened into one sentence, split it back into one line per `=` or `\\implies` step.
 - Question/part numbering: preserve EXACTLY (`1.`, `(a)`, `(i)`, `(ii)`, etc.).
-- For diagrams that cannot be transcribed as text, populate the `diagrams[]` array
-  with a factual description. NEVER invent detail you cannot see.
 - Mark illegible text with `[illegible]` inline AND list the region in
   `illegible_regions[]`. Do not guess.
 - Do not add solutions, hints, or content that is not visible in the source image(s).
+
+Reading order & layout (CRITICAL — get this right before anything else):
+- Read each page strictly top-to-bottom; resolve same-line elements left-to-right.
+- If the page is in two columns, finish the LEFT column entirely before starting
+  the right column. Never weave text from both columns into one paragraph.
+- Marks like "[3]" or "[2 marks]" printed at the right edge of a line belong to the
+  part on the SAME line, not to the next part below.
+- Each diagram, graph, or table belongs to the question element it sits CLOSEST TO
+  in reading order, attached BELOW. A figure sitting between "(b) Find..." and the
+  next numbered text belongs to part (b). Record this in `diagrams[].location`.
+- Text printed INSIDE a figure (axis labels, vertex names, "Fig. 3" captions, arrow
+  callouts) is NOT part of the surrounding stem/part text. Move it into the
+  diagram's `labels[]` array instead.
+- Do not re-order parts to make the math flow better. If part (b) is printed above
+  part (a) (rare layout glitch), keep the printed order.
+- If a part runs across a column break or page break, stitch its text together in
+  reading order but keep it inside ONE `parts[]` entry — do not split into two.
+
+Describing diagrams (this is where outputs are weakest — be exhaustive):
+- Populate `kind` with the best-fit category (geometric_figure, function_plot, graph,
+  force_diagram, free_body, tree_diagram, venn, table, circuit, scatter, histogram,
+  bar_chart, number_line, sample_space, other).
+- For a geometric figure: name every labelled vertex, every labelled side WITH its
+  length if shown, every marked angle WITH its value, every right-angle box, every
+  pair of equal-length tick marks, every "parallel" arrow mark, every shaded region,
+  and state which lines are dashed vs solid.
+- For a function plot or graph: state the axis labels (with units), the visible
+  range on each axis, whether the curve is solid or dashed, every marked intercept,
+  every asymptote (vertical/horizontal/oblique), every critical point or labelled
+  coordinate, and what the curve qualitatively does (e.g. "concave up, crosses
+  x-axis at x=2, has a minimum near (1, -3), approaches y=4 as x→∞").
+- For a force / free-body diagram: list every force arrow (direction, magnitude
+  label if shown, point of application), every mass label, every angle to the
+  horizontal or to a surface, and any pivot / fixed point markings.
+- For a table: list the column headers in order, the row headers if present, and
+  the cell values row-by-row. If the table is big, describe its shape and
+  reproduce the first 2 rows verbatim.
+- Put every text label visible INSIDE the figure into `labels[]` as a separate
+  string. E.g. labels=["A","B","C","60°","5 cm","x","y axis","Fig. 2"].
+- If a feature is ambiguous, say "appears to be" — do NOT invent specific values.
 
 Routing rules:
 - If a solution / mark-scheme image is present, populate `solution`. Prefer the
